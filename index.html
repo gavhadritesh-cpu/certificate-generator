@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Certificate Generator</title>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- QR Code -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+body { font-family: Arial; background:#f4f4f4; }
+form {
+    background:#fff;
+    padding:20px;
+    width:400px;
+    margin:20px auto;
+}
+input, button {
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+}
+button {
+    background:#007bff;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+#qr {
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<form onsubmit="generateCertificate(event)">
+    <h2>Generate Certificate</h2>
+
+    <input type="text" id="name" placeholder="Student Name" required>
+    <input type="text" id="course" placeholder="Course Name" required>
+    <input type="text" id="score" placeholder="Score (%)" required>
+    <input type="text" id="date" placeholder="Date Range" required>
+
+    <button type="submit">Download Certificate PDF</button>
+</form>
+
+<!-- QR Code Container -->
+<div id="qr"></div>
+
+<script>
+function generateCertificate(e) {
+    e.preventDefault();
+
+    const name   = document.getElementById("name").value;
+    const course = document.getElementById("course").value;
+    const score  = document.getElementById("score").value;
+    const date   = document.getElementById("date").value;
+
+    // Clear old QR
+    document.getElementById("qr").innerHTML = "";
+
+    // Generate QR
+    const qrText = `Name: ${name}, Course: ${course}, Score: ${score}%`;
+    const qr = new QRCode(document.getElementById("qr"), {
+        text: qrText,
+        width: 100,
+        height: 100
+    });
+
+    // Wait for QR to render
+    setTimeout(() => {
+        const qrImg = document.querySelector("#qr img");
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("landscape");
+
+        // Certificate Border
+        pdf.rect(10, 10, 280, 190);
+
+        pdf.setFontSize(30);
+        pdf.text("Certificate of Completion", 150, 40, { align: "center" });
+
+        pdf.setFontSize(16);
+        pdf.text("This is to certify that", 150, 60, { align: "center" });
+
+        pdf.setFontSize(22);
+        pdf.text(name, 150, 75, { align: "center" });
+
+        pdf.setFontSize(16);
+        pdf.text("has successfully completed the course", 150, 90, { align: "center" });
+
+        pdf.setFontSize(20);
+        pdf.text(course, 150, 105, { align: "center" });
+
+        pdf.setFontSize(16);
+        pdf.text(`With score: ${score}%`, 150, 120, { align: "center" });
+
+        pdf.text(`Dated: ${date}`, 150, 135, { align: "center" });
+
+        // Add QR to PDF
+        pdf.addImage(qrImg.src, "PNG", 20, 120, 40, 40);
+
+        pdf.save(`certificate_${name}.pdf`);
+    }, 500);
+}
+</script>
+
+</body>
+</html>
