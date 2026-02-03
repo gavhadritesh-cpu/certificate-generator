@@ -64,7 +64,7 @@ function generateCertificate(e) {
     document.getElementById("qr").innerHTML = "";
 
     // Generate QR
-    const qrText = `Name: ${name}, Course: ${course}, Score: ${score}%`;
+    const qrText = `https://gavhadritesh-cpu.github.io/certificate-generator/`;
     const qr = new QRCode(document.getElementById("qr"), {
         text: qrText,
         width: 100,
@@ -111,3 +111,4 @@ function generateCertificate(e) {
 
 </body>
 </html>
+
